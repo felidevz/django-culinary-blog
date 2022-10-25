@@ -1,0 +1,36 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+<title>Newsletter | {{ request.get_host }}</title>
+{% endblock %}
+
+{% block content %}
+  <div class="newsletter-detail">
+
+    <h2 class="newsletter-confirmation">
+      {% if bad_request %}
+        {{ bad_request }}
+      {% elif error %}
+        {{ error }}
+      {% elif subscriber %}
+        {{ subscriber }}
+      {% else %}
+        Thank you for subscribing
+      {% endif %}
+    </h2>
+
+    <p class="newsletter-info">
+      {% if bad_request %}
+        You tried to access this page directly.<br>
+        Enter your email address in the newsletter form instead.
+      {% elif error %}
+        Sorry, you entered an incorrect email address.<br>
+        Please correct it and try again.
+      {% elif subscriber %}
+        A user with the given email address already exists and receives notifications about new recipes.
+      {% else %}
+        From now you will receive notifications about new recipes on the website.
+      {% endif %}
+    </p>
+  </div>
+{% endblock %}

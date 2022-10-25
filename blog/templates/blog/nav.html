@@ -1,0 +1,19 @@
+<nav>
+  <div class="site-menu">
+    <ul class="site-nav">
+      {% for category in categories %}
+        <li class="menu-item">
+          <a href="{% url 'blog:category' category.slug %}">{{ category.name }}</a>
+
+          <div class="dropdown-menu">
+            <ul class="dropdown-nav">
+              {% for subcategory in category.subcategory.all %}
+                <li class="dropdown-item"><a href="{% url 'blog:subcategory' subcategory.slug %}">{{ subcategory.name }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>

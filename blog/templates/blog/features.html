@@ -1,0 +1,64 @@
+<div class="features">
+  <div class="facebook">
+    <div class="features-title">
+      <p>Facebook</p>
+    </div>
+    <div class="fb-page" data-href="https://www.facebook.com/facebook" data-tabs="" data-width="500" data-height="" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" data-lazy="true"><blockquote cite="https://www.facebook.com/facebook" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/facebook">Facebook</a></blockquote></div>
+  </div>
+
+  <div class="socials">
+    <div class="features-title">
+      <p>Socials</p>
+    </div>
+    <div class="icons">
+      <div class="social">
+        <a href="https://www.twitter.com/" target="_blank">
+          <i class="fa-brands fa-twitter"></i>
+          <p>Twitter</p>
+        </a>
+      </div>
+      <div class="social">
+        <a href="https://www.instagram.com/" target="_blank">
+          <i class="fa-brands fa-instagram"></i>
+          <p>Instagram</p>
+        </a>
+      </div>
+      <div class="social">
+        <a href="https://www.facebook.com/" target="_blank">
+          <i class="fa-brands fa-facebook"></i>
+          <p>Facebook</p>
+        </a>
+      </div>
+      <div class="social">
+        <a href="https://www.pinterest.com/" target="_blank">
+          <i class="fa-brands fa-pinterest"></i>
+          <p>Pinterest</p>
+        </a>
+      </div>
+      <div class="social">
+        <a href="https://www.tiktok.com/" target="_blank">
+          <i class="fa-brands fa-tiktok"></i>
+          <p>Tiktok</p>
+        </a>
+      </div>
+      <div class="social">
+        <a href="https://www.youtube.com/" target="_blank">
+          <i class="fa-brands fa-youtube"></i>
+          <p>Youtube</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="newsletter">
+    <div class="features-title">
+      <p>Newsletter</p>
+    </div>
+    <p class="newsletter-text">Zapisz się do newslettera, aby otrzymywać powiadomienia o nowych przepisach.</p>
+    <form action="{% url 'blog:newsletter' %}" method="POST">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="email" required>
+      <button>Subskrybuj</button>
+    </form>
+  </div>
+</div>

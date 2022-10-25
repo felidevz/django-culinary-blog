@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% block title %}{% endblock %}
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'blog/style.css' %}">
+  <script src="https://kit.fontawesome.com/2ffe2eafe6.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v15.0" nonce="AJU8EHi3"></script>
+</head>
+<body>
+  <header>
+    <div class="site-logo">
+      <div class="site-title">
+        <h1><a href="{% url 'blog:index' %}">{{ request.get_host }}</a></h1>
+      </div>
+      <div class="site-description">sprawdzone przepisy kulinarne</div>
+    </div>
+  </header>
+
+  {% include 'blog/nav.html' %}
+
+  <main>
+    <div class="site-content">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+    {% include 'blog/features.html' %}
+  </main>
+
+  <footer>
+    <p><a href="https://www.github.com/felidevz" target="_blank">@felidev</a></p>
+  </footer>
+</body>
+</html>
