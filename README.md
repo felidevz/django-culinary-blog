@@ -1,0 +1,1 @@
+# Culinary blog with Django
