@@ -23,7 +23,7 @@ class Post(models.Model):
 
 
 class Ingredient(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='ingredients')
     content = models.CharField(max_length=100)
 
     def __str__(self):
@@ -60,3 +60,21 @@ class NewsletterSubscriber(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    reply_to = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='reply_comments', null=True, blank=True)
+    name = models.CharField(max_length=50)
+    content = models.TextField()
+    email = models.EmailField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField(default=False)
+    is_post_author = models.BooleanField(default=False)
+    avatar = models.ImageField(upload_to='blog/', default='blog/anonymous-user.png')
+
+    class Meta:
+        ordering = ('created_on',)
+
+    def __str__(self):
+        return self.content

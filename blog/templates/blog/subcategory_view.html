@@ -8,7 +8,7 @@
   {% for post in page_obj %}
     <div class="content-row {% cycle 'odd' 'even' %}">
       <div class="content-image" style="background-image: url('{{ post.photo.first.image.url }}');">
-        <a href="" title="{{ post.title }}">
+        <a href="{% url 'blog:post_detail' post.slug %}" title="{{ post.title }}">
           <div class="content-date {% cycle 'left-date' 'right-date' %}">
             <p>{{ post.created_on|date:'d E Y' }}</p>
           </div>
@@ -16,12 +16,12 @@
       </div>
       <div class="content-description">
         <div class="content-category">
-          <span><a href="">{{ post.subcategory.category }}</a></span>
+          <span><a href="{% url 'blog:category' post.subcategory.category.slug %}">{{ post.subcategory.category }}</a></span>
         </div>
-        <h2><a href="">{{ post.title }}</a></h2>
+        <h2><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h2>
         <p>{{ post.description|truncatechars:300|capfirst }}</p>
-        <a href="" class="content-read">Czytaj dalej</a>
-        <a href="" class="content-comments"><i class="fa-solid fa-comments"></i>Komentarzy: 2</a>
+        <a href="{% url 'blog:post_detail' post.slug %}" class="content-read">Czytaj dalej</a>
+        <a href="{% url 'blog:post_detail' post.slug %}" class="content-comments"><i class="fa-solid fa-comments"></i>Komentarzy: 2</a>
       </div>
     </div>
   {% endfor %}

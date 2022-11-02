@@ -2,7 +2,7 @@
 *~
 __pycache__
 venv
-db.sqlite3
-static
+*.sqlite3
 media
 .idea
+migrations

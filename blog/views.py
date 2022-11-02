@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.core.mail import send_mail
 
-from blog.models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber
+from blog.models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber, Comment
+from blog.forms import CommentForm
 import re
+import random
 
 
 def index_view(request):
@@ -84,6 +86,72 @@ def subcategory_view(request, slug):
         'subcategory': subcategory
     }
     return render(request, 'blog/subcategory_view.html', context)
+
+
+def post_detail_view(request, slug):
+    categories = Category.objects.all()
+    post = get_object_or_404(Post, slug=slug)
+    photos = post.photo.all()[1:]
+    similar_posts = Post.objects.filter(subcategory=post.subcategory).exclude(pk=post.pk)
+    similar_posts_len = len(similar_posts) if len(similar_posts) <= 4 else 4
+    similar_posts = random.sample(list(similar_posts), k=similar_posts_len)
+    try:
+        previous_post = Post.objects.filter(created_on__lte=post.created_on).exclude(pk=post.pk)[0]
+    except IndexError:
+        previous_post = ''
+    try:
+        next_post = Post.objects.filter(created_on__gte=post.created_on).exclude(pk=post.pk).order_by('created_on')[0]
+    except IndexError:
+        next_post = ''
+    comments = Comment.objects.filter(post=post, published=True, reply_to__exact=None).order_by('-created_on')
+    comments_count = Comment.objects.filter(post=post, published=True).count()
+    context = {
+        'categories': categories,
+        'post': post,
+        'photos': photos,
+        'more_posts': similar_posts,
+        'previous_post': previous_post,
+        'next_post': next_post,
+        'comments': comments,
+        'comments_count': comments_count
+    }
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        print(request.POST)
+        print(form.is_valid())
+        if form.is_valid():
+            print('sama forma prawidłowa')
+            try:
+                reply_to_pk = int(form.cleaned_data['reply_to'])
+                new_comment = Comment(
+                    post=post,
+                    reply_to=Comment.objects.get(pk=reply_to_pk),
+                    name=form.cleaned_data['name'],
+                    content=form.cleaned_data['content'],
+                    email=form.cleaned_data['email']
+                )
+                new_comment.save()
+            except (TypeError, ValueError, Comment.DoesNotExist):
+                new_comment = Comment(
+                    post=post,
+                    name=form.cleaned_data['name'],
+                    content=form.cleaned_data['content'],
+                    email=form.cleaned_data['email']
+                )
+                new_comment.save()
+            return redirect(reverse('blog:post_detail', kwargs={'slug': slug}))
+    else:
+        form = CommentForm()
+    captcha1 = random.randint(11, 29)
+    captcha2 = random.randint(1, 9)
+    context['captcha1'] = captcha1
+    context['captcha2'] = captcha2
+    valid_captcha = captcha1 - captcha2
+    context['valid_captcha'] = valid_captcha
+
+    context['form'] = form
+
+    return render(request, 'blog/post_detail_view.html', context)
 
 
 def newsletter_view(request):

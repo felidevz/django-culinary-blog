@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.mail import send_mass_mail
 
-from blog.models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber
+from blog.models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber, Comment
 
 
 class IngredientInline(admin.TabularInline):
@@ -56,3 +56,8 @@ class SubcategoryAdmin(admin.ModelAdmin):
 @admin.register(NewsletterSubscriber)
 class NewsletterSubcriberAdmin(admin.ModelAdmin):
     list_display = ('email',)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'content', 'created_on', 'published')

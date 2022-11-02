@@ -1,0 +1,173 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+  <title>{{ post.title|capfirst }} | {{ request.get_host }}</title>
+{% endblock %}
+
+{% block content %}
+  <div class="content-category post-category">
+    <span>{{ post.created_on|date:'d E Y' }} / <a href="{% url 'blog:category' post.subcategory.category.slug %}">{{ post.subcategory.category }}</a></span>
+  </div>
+  <h2 class="post-title">{{ post.title }}</h2>
+  <p class="post-description">{{ post.description }}</p>
+  <div class="post-image" title="{{ post.title }}" style="background-image: url('{{ post.photo.first.image.url }}');"></div>
+
+  <div class="post-content">
+    <p class="post-section-title">Składniki:</p>
+    <ul>
+      {% for ingredient in post.ingredients.all %}
+        <li>{{ ingredient }}</li>
+      {% endfor %}
+    </ul>
+    <p class="post-section-title">Przygotowanie:</p>
+    <p class="post-preparation">{{ post.preparation|capfirst }}</p>
+    <p class="post-greetings">Smacznego!</p>
+  </div>
+
+  <div class="post-gallery">
+    {% for photo in photos %}
+      <div style="background-image: url('{{ photo.image.url }}');"></div>
+    {% endfor %}
+  </div>
+
+  <p class="recipe-source">Źródło: <a href="google.pl">google.pl</a></p>
+
+  {% if more_posts %}
+    <div class="more-posts">
+      <p>Sprawdź także:</p>
+      <div class="posts">
+        {% for post in more_posts %}
+          <div class="post">
+            <a href="{% url 'blog:post_detail' post.slug %}">
+              <img src="{{ post.photo.first.image.url }}">
+              <p>{{ post.title }}</p>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="previous-next-posts">
+    {% if previous_post %}
+      <a href="{% url 'blog:post_detail' previous_post.slug %}" class="previous-post">
+        <p>&laquo; Poprzedni wpis</p>
+        <p class="previous-post-title">{{ previous_post.title }}</p>
+      </a>
+    {% endif %}
+
+    {% if next_post %}
+      <a href="{% url 'blog:post_detail' next_post.slug %}" class="next-post">
+        <p>Następny wpis &raquo;</p>
+        <p class="next-post-title">{{ next_post.title }}</p>
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="comments-section">
+    <p class="comments-counter">Komentarzy: {{ comments_count }}</p>
+
+    {% for comment in comments %}
+      <div class="single-comment">
+        <div class="comment-header">
+          <img src="{{ comment.avatar.url }}">
+          <div class="comment-info">
+            <p class="comment-author">{{ comment.name }} {% if comment.is_post_author %}<span class="comment-post-author">Autor</span>{% endif %}</p>
+            <p class="comment-date">{{ comment.created_on|date:'d M Y' }} / {{ comment.created_on|time:'H:i' }}</p>
+          </div>
+        </div>
+
+        <p class="comment-content">{{ comment.content|capfirst }}</p>
+
+        <p class="comment-reply"><a class="comment-reply-href" onclick="hideShowCommentAdd('{{ comment.pk }}')"><i class="fa-solid fa-reply"></i> Odpowiedz</a></p>
+
+        {% for reply in comment.reply_comments.all %}
+          <div class="single-comment-reply">
+            <div class="comment-header">
+              <img src="{{ reply.avatar.url }}">
+              <div class="comment-info">
+                <p class="comment-author">{{ reply.name }} {% if reply.is_post_author %}<span class="comment-post-author">Autor</span>{% endif %}</p>
+                <p class="comment-date">{{ reply.created_on|date:'d M Y' }} / {{ reply.created_on|time:'H:i' }}</p>
+              </div>
+            </div>
+
+            <p class="comment-content-reply">{{ reply.content|capfirst }}</p>
+          </div>
+        {% endfor %}
+
+        <div id="comment-add-reply-{{ comment.pk }}" class="comment-add comment-add-reply">
+          <p class="comment-add-title">Odpowiedz użytkownikowi {{ comment.name }} <a class="reply-cancel" onclick="hideShowCommentAdd('{{ comment.pk }}')"><i class="fa-sharp fa-solid fa-comment-slash"></i> Anuluj pisanie odpowiedzi</a></p>
+          <p class="comment-add-description">Twój adres email nie zostanie opublikowany.</p>
+
+          <form action="" method="POST">
+            {% csrf_token %}
+
+            <input type="hidden" name="comment-add-reply_to" value="{{ comment.pk }}">
+
+            {{ form.non_field_errors }}
+
+            {{ form.name.label_tag }}
+            {{ form.name.errors }}
+            {{ form.name }}
+
+            {{ form.content.label_tag }}
+            {{ form.content.errors }}
+            {{ form.content }}
+
+            {{ form.email.label_tag }}
+            {{ form.email.errors }}
+            {{ form.email }}
+
+            {{ form.captcha.label_tag }}
+            {{ form.captcha.errors }}
+            <p>
+              <span class="comment-add-captcha">{{ captcha1 }} - {{ captcha2 }} = </span>
+              {{ form.captcha }}
+            </p>
+            <input type="hidden" name="comment-add-valid_captcha" value="{{ valid_captcha }}">
+
+            <button type="submit">Opublikuj</button>
+          </form>
+        </div>
+
+        <hr>
+      </div>
+    {% endfor %}
+
+
+    <div id="comment-add" class="comment-add">
+      <p class="comment-add-title">Dodaj komentarz</p>
+      <p class="comment-add-description">Twój adres email nie zostanie opublikowany.</p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+
+        <input type="hidden" name="comment-add-reply_to" value="">
+
+        {{ form.non_field_errors }}
+
+        {{ form.name.label_tag }}
+        {{ form.name.errors }}
+        {{ form.name }}
+
+        {{ form.content.label_tag }}
+        {{ form.content.errors }}
+        {{ form.content }}
+
+        {{ form.email.label_tag }}
+        {{ form.email.errors }}
+        {{ form.email }}
+
+        {{ form.captcha.label_tag }}
+        {{ form.captcha.errors }}
+        <p>
+          <span class="comment-add-captcha">{{ captcha1 }} - {{ captcha2 }} = </span>
+          {{ form.captcha }}
+        </p>
+        <input type="hidden" name="comment-add-valid_captcha" value="{{ valid_captcha }}">
+
+        <button type="submit">Opublikuj</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
