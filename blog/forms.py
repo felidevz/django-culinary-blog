@@ -1,6 +1,18 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from .models import NewsletterSubscriber
+
+
+class NewsletterForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'email'}))
+
+    def clean_email(self):
+        cleaned_email = self.cleaned_data['email']
+        if NewsletterSubscriber.objects.filter(email=cleaned_email).exists():
+            raise ValidationError('Użytkownik o podanym adresie email już istnieje.')
+        return cleaned_email
+
 
 class CommentForm(forms.Form):
     reply_to = forms.CharField(widget=forms.HiddenInput, required=False)

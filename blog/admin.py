@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.core.mail import send_mass_mail
 
-from blog.models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber, Comment
+from .models import Post, Ingredient, Photo, Category, Subcategory, NewsletterSubscriber, Comment
+
+from threading import Thread
 
 
 class IngredientInline(admin.TabularInline):
@@ -32,11 +34,15 @@ class PostAdmin(admin.ModelAdmin):
                 message = (
                     f'{obj.title} - new recipe on {request.get_host()}',
                     f'New recipe available on {request.get_host()}\n'
-                    f'Link: https://127.0.0.1:8000/{obj.slug}/',
-                    'felidevsender@gmail.com',
-                    [str(subscriber.email) for subscriber in subscribers if subscriber.email]
+                    f'Link: {request.get_host()}{obj.get_absolute_url()}',
+                    None,
+                    [subscriber.email for subscriber in subscribers if subscriber.email]
                 )
-                send_mass_mail((message,))
+                try:
+                    email_thread = Thread(target=send_mass_mail, kwargs={'datatuple': (message,)})
+                    email_thread.start()
+                except Exception as e:
+                    print(e)
         super().save_model(request, obj, form, change)
 
 
@@ -49,7 +55,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Subcategory)
 class SubcategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'category')
-    ordering = ('category',)
+    ordering = ['category']
     prepopulated_fields = {'slug': ('name',)}
 
 
@@ -61,3 +67,4 @@ class NewsletterSubcriberAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('name', 'content', 'created_on', 'published')
+    ordering = ['-created_on']
